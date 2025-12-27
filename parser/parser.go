@@ -404,7 +404,8 @@ func (p *Parser) parseRange() (Node, error) {
 	return &RangeNode{Position: pos, Collection: collection, Body: body}, nil
 }
 
-// parseInclude parses an include directive (simplified).
+// parseInclude parses an include directive with optional parameters.
+// Supports: {{include "template"}} or {{include "template" key=value}} or {{include "template" .context}}
 func (p *Parser) parseInclude() (Node, error) {
 	pos := Position{Line: p.current.Line, Column: p.current.Column}
 	p.nextToken() // consume 'include'
@@ -416,13 +417,51 @@ func (p *Parser) parseInclude() (Node, error) {
 	templateName := p.current.Value
 	p.nextToken()
 
+	// Parse optional parameters or context
+	var params map[string]Node
+	var context Node
+
+	// Check if there are more tokens before }}
+	for p.current.Type != lexer.TokenCloseDelim && p.current.Type != lexer.TokenEOF {
+		// Check if it's a named parameter (key=value)
+		if p.current.Type == lexer.TokenIdent && p.peek.Type == lexer.TokenAssign {
+			if params == nil {
+				params = make(map[string]Node)
+			}
+
+			paramName := p.current.Value
+			p.nextToken() // consume param name
+			p.nextToken() // consume '='
+
+			// Parse the value expression (use parsePrimary for simple values)
+			valueExpr, err := p.parsePrimary()
+			if err != nil {
+				return nil, err
+			}
+			params[paramName] = valueExpr
+		} else {
+			// It's a context expression (like .user)
+			ctxExpr, err := p.parseValue()
+			if err != nil {
+				return nil, err
+			}
+			context = ctxExpr
+			break // Context should be last
+		}
+	}
+
 	// Expect }}
 	if p.current.Type != lexer.TokenCloseDelim {
 		return nil, p.error("expected }} after include")
 	}
 	p.nextToken() // consume }}
 
-	return &IncludeNode{Position: pos, Template: templateName}, nil
+	return &IncludeNode{
+		Position: pos,
+		Template: templateName,
+		Params:   params,
+		Context:  context,
+	}, nil
 }
 
 // parseExtends parses an extends directive.

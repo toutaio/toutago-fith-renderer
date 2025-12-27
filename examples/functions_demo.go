@@ -126,7 +126,7 @@ func demoWithCustom(template string, data interface{}) {
 	// For production, we'd need to expose a way to use custom runtime
 	_ = ast
 	_ = rt
-	
+
 	// Manual execution for demo
 	fmt.Println("Double: 14")
 	fmt.Println("Triple: 21")
