@@ -10,16 +10,23 @@ import (
 
 // Runtime executes parsed templates with a given context.
 type Runtime struct {
-	context *Context
-	output  *bytes.Buffer
+	context   *Context
+	output    *bytes.Buffer
+	functions *FunctionRegistry
 }
 
 // NewRuntime creates a new runtime with the given context.
 func NewRuntime(ctx *Context) *Runtime {
 	return &Runtime{
-		context: ctx,
-		output:  &bytes.Buffer{},
+		context:   ctx,
+		output:    &bytes.Buffer{},
+		functions: NewFunctionRegistry(),
 	}
+}
+
+// RegisterFunction adds a custom function to the runtime.
+func (r *Runtime) RegisterFunction(name string, fn Function) {
+	r.functions.Register(name, fn)
 }
 
 // Execute executes a parsed template and returns the rendered output.
@@ -212,7 +219,7 @@ func (r *Runtime) executeRangeMap(node *parser.RangeNode, keys []interface{}, va
 	return nil
 }
 
-// executeCall executes a function call (simplified for now).
+// executeCall executes a function call.
 func (r *Runtime) executeCall(node *parser.CallNode) error {
 	// Special case: if it's a no-arg call starting with @, treat it as a variable
 	if len(node.Args) == 0 && len(node.Function) > 0 && node.Function[0] == '@' {
@@ -225,16 +232,46 @@ func (r *Runtime) executeCall(node *parser.CallNode) error {
 		return nil
 	}
 
-	// For now, function calls are not fully implemented
-	// We'll add this in Phase 4
-	return fmt.Errorf("function calls not yet implemented: %s", node.Function)
+	// Evaluate all arguments
+	args := make([]interface{}, len(node.Args))
+	for i, argNode := range node.Args {
+		val, err := r.evaluateExpression(argNode)
+		if err != nil {
+			return fmt.Errorf("function argument error at %d:%d: %v", node.Position.Line, node.Position.Column, err)
+		}
+		args[i] = val
+	}
+
+	// Call the function
+	result, err := r.functions.Call(node.Function, args...)
+	if err != nil {
+		return fmt.Errorf("function call error at %d:%d: %v", node.Position.Line, node.Position.Column, err)
+	}
+
+	// Output the result
+	r.output.WriteString(fmt.Sprint(result))
+	return nil
 }
 
-// executePipe executes a pipe expression (simplified for now).
+// executePipe executes a pipe expression.
 func (r *Runtime) executePipe(node *parser.PipeNode) error {
-	// For now, pipes are not fully implemented
-	// We'll add this in Phase 4
-	return fmt.Errorf("pipe expressions not yet implemented")
+	// Evaluate the initial value
+	val, err := r.evaluateExpression(node.Value)
+	if err != nil {
+		return fmt.Errorf("pipe value error: %v", err)
+	}
+
+	// Apply each filter in sequence
+	for _, filterName := range node.Filters {
+		val, err = r.functions.Call(filterName, val)
+		if err != nil {
+			return fmt.Errorf("filter error (%s): %v", filterName, err)
+		}
+	}
+
+	// Output the final result
+	r.output.WriteString(fmt.Sprint(val))
+	return nil
 }
 
 // evaluateExpression evaluates an expression node and returns its value.
@@ -255,7 +292,16 @@ func (r *Runtime) evaluateExpression(node parser.Node) (interface{}, error) {
 		if len(n.Args) == 0 && len(n.Function) > 0 && n.Function[0] == '@' {
 			return r.context.Get([]string{n.Function})
 		}
-		return nil, fmt.Errorf("function calls not yet supported in expressions")
+		// Evaluate function calls
+		args := make([]interface{}, len(n.Args))
+		for i, argNode := range n.Args {
+			val, err := r.evaluateExpression(argNode)
+			if err != nil {
+				return nil, err
+			}
+			args[i] = val
+		}
+		return r.functions.Call(n.Function, args...)
 	default:
 		return nil, fmt.Errorf("cannot evaluate node type: %T", node)
 	}
