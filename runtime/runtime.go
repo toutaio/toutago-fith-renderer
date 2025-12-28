@@ -29,6 +29,21 @@ func (r *Runtime) RegisterFunction(name string, fn Function) {
 	r.functions.Register(name, fn)
 }
 
+// GetContext returns the runtime's context.
+func (r *Runtime) GetContext() *Context {
+	return r.context
+}
+
+// ExecuteTemplate executes a template and stores the output.
+func (r *Runtime) ExecuteTemplate(template *parser.Template) error {
+	return r.executeTemplate(template)
+}
+
+// Output returns the rendered output.
+func (r *Runtime) Output() string {
+	return r.output.String()
+}
+
 // Execute executes a parsed template and returns the rendered output.
 func Execute(template *parser.Template, ctx *Context) (string, error) {
 	rt := NewRuntime(ctx)

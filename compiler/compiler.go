@@ -80,6 +80,11 @@ func New(loader TemplateLoader) *Compiler {
 	}
 }
 
+// NewCompiler is an alias for New.
+func NewCompiler(loader TemplateLoader) *Compiler {
+	return New(loader)
+}
+
 // Compile compiles a template by slug, with caching and optimization.
 func (c *Compiler) Compile(slug string) (*CompiledTemplate, error) {
 	// Generate cache key
@@ -115,6 +120,28 @@ func (c *Compiler) Compile(slug string) (*CompiledTemplate, error) {
 
 	// Cache it
 	c.cache.Set(cacheKey, compiled)
+
+	return compiled, nil
+}
+
+// CompileWithoutCache compiles a template without using the cache.
+func (c *Compiler) CompileWithoutCache(tmpl *parser.Template) (*CompiledTemplate, error) {
+	// Resolve dependencies
+	deps, err := c.resolveDependencies(tmpl)
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve dependencies: %w", err)
+	}
+
+	// Optimize AST
+	optimized := c.optimizer.Optimize(tmpl)
+
+	// Create compiled template
+	compiled := &CompiledTemplate{
+		AST:          optimized,
+		Dependencies: deps,
+		CacheKey:     "",
+		IsOptimized:  true,
+	}
 
 	return compiled, nil
 }

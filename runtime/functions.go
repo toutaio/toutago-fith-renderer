@@ -45,6 +45,11 @@ func (r *FunctionRegistry) Call(name string, args ...interface{}) (interface{}, 
 	return fn(args...)
 }
 
+// AllFunctions returns all registered functions.
+func (r *FunctionRegistry) AllFunctions() map[string]Function {
+	return r.funcs
+}
+
 // registerBuiltins adds all built-in functions to the registry.
 func (r *FunctionRegistry) registerBuiltins() {
 	// String functions
