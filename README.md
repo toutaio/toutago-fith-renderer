@@ -141,6 +141,17 @@ go get github.com/toutaio/toutago-fith-renderer
 - [Built-in Functions](docs/functions.md) - All 16 built-in functions
 - [Migration Guide](docs/migration.md) - Migrate from other template engines
 - [Performance Guide](docs/performance.md) - Optimization tips and benchmarks
+- [Toutā Integration](docs/touta-integration.md) - Integrate with Toutā framework
+
+## Examples
+
+- [HTML Generation](examples/html/) - Web pages, dashboards, layouts
+- [CSV Export](examples/csv/) - Data export and reporting
+- [Markdown Docs](examples/markdown/) - Documentation generation
+- [Email Templates](examples/email/) - Transactional emails
+- [Basic Usage](examples/basic/) - Simple examples
+- [Composition](examples/composition_demo.go) - Includes and layouts
+- [Functions](examples/functions_demo.go) - Built-in function demos
 
 ## Development
 
