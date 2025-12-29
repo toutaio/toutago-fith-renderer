@@ -41,7 +41,7 @@ func TestLexer_MultipleExpressions(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	
+
 	// Count identifiers
 	count := 0
 	for _, tok := range tokens {
@@ -63,7 +63,7 @@ func TestLexer_StringWithEscapes(t *testing.T) {
 		{`{{'it\'s'}}`, `it\'s`},
 		{`{{"test\\path"}}`, `test\\path`},
 	}
-	
+
 	for _, tt := range tests {
 		l := New(tt.input)
 		l.NextToken() // {{
@@ -91,7 +91,7 @@ func TestLexer_NumberFormats(t *testing.T) {
 		{"{{0.5}}", "0.5"},
 		{"{{100.0}}", "100.0"},
 	}
-	
+
 	for _, tt := range tests {
 		l := New(tt.input)
 		l.NextToken() // {{
@@ -130,7 +130,7 @@ func TestLexer_UnterminatedString(t *testing.T) {
 		`{{'unclosed`,
 		`{{"has\nnewline"}}`,
 	}
-	
+
 	for _, input := range inputs {
 		l := New(input)
 		l.NextToken() // {{
@@ -163,7 +163,7 @@ func TestLexer_AllOperators(t *testing.T) {
 		{"{{!}}", TokenNot},
 		{"{{=}}", TokenAssign},
 	}
-	
+
 	for _, tt := range operators {
 		l := New(tt.input)
 		l.NextToken() // {{
@@ -188,7 +188,7 @@ func TestLexer_Keywords(t *testing.T) {
 		"extends": TokenExtends,
 		"block":   TokenBlock,
 	}
-	
+
 	for word, expectedType := range keywords {
 		input := "{{" + word + "}}"
 		l := New(input)
