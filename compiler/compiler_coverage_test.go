@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/toutaio/toutago-fith-renderer/lexer"
 	"github.com/toutaio/toutago-fith-renderer/loader"
 	"github.com/toutaio/toutago-fith-renderer/parser"
 )
@@ -22,7 +23,9 @@ func TestCompiler_ResolveDependenciesWithNested(t *testing.T) {
 	ldr := loader.NewFileSystemLoader(tmpDir, []string{".html"})
 	c := New(ldr)
 
-	tmpl, err := parser.New(`{{include "main"}}`).Parse()
+	l := lexer.New(`{{include "main"}}`)
+	p := parser.New(l)
+	tmpl, err := p.Parse()
 	if err != nil {
 		t.Fatalf("parse error: %v", err)
 	}
@@ -46,7 +49,9 @@ func TestCompiler_ResolveExtendsChain(t *testing.T) {
 	ldr := loader.NewFileSystemLoader(tmpDir, []string{".html"})
 	c := New(ldr)
 
-	tmpl, err := parser.New(`{{extends "middle"}}`).Parse()
+	l := lexer.New(`{{extends "middle"}}`)
+	p := parser.New(l)
+	tmpl, err := p.Parse()
 	if err != nil {
 		t.Fatalf("parse error: %v", err)
 	}
@@ -66,7 +71,9 @@ func TestCompiler_MissingTemplate(t *testing.T) {
 	ldr := loader.NewFileSystemLoader(tmpDir, []string{".html"})
 	c := New(ldr)
 
-	tmpl, err := parser.New(`{{include "missing"}}`).Parse()
+	l := lexer.New(`{{include "missing"}}`)
+	p := parser.New(l)
+	tmpl, err := p.Parse()
 	if err != nil {
 		t.Fatalf("parse error: %v", err)
 	}
@@ -84,7 +91,9 @@ func TestCompiler_IfNodeDependencies(t *testing.T) {
 	ldr := loader.NewFileSystemLoader(tmpDir, []string{".html"})
 	c := New(ldr)
 
-	tmpl, err := parser.New(`{{if .x}}{{include "partial"}}{{end}}`).Parse()
+	l := lexer.New(`{{if .x}}{{include "partial"}}{{end}}`)
+	p := parser.New(l)
+	tmpl, err := p.Parse()
 	if err != nil {
 		t.Fatalf("parse error: %v", err)
 	}
@@ -106,7 +115,9 @@ func TestCompiler_RangeNodeDependencies(t *testing.T) {
 	ldr := loader.NewFileSystemLoader(tmpDir, []string{".html"})
 	c := New(ldr)
 
-	tmpl, err := parser.New(`{{range .items}}{{include "item"}}{{end}}`).Parse()
+	l := lexer.New(`{{range .items}}{{include "item"}}{{end}}`)
+	p := parser.New(l)
+	tmpl, err := p.Parse()
 	if err != nil {
 		t.Fatalf("parse error: %v", err)
 	}
@@ -128,7 +139,9 @@ func TestCompiler_BlockNodeDependencies(t *testing.T) {
 	ldr := loader.NewFileSystemLoader(tmpDir, []string{".html"})
 	c := New(ldr)
 
-	tmpl, err := parser.New(`{{block "main"}}{{include "widget"}}{{end}}`).Parse()
+	l := lexer.New(`{{block "main"}}{{include "widget"}}{{end}}`)
+	p := parser.New(l)
+	tmpl, err := p.Parse()
 	if err != nil {
 		t.Fatalf("parse error: %v", err)
 	}
@@ -151,7 +164,9 @@ func TestCompiler_DuplicateDependencies(t *testing.T) {
 	c := New(ldr)
 
 	// Include same template twice
-	tmpl, err := parser.New(`{{include "common"}}{{include "common"}}`).Parse()
+	l := lexer.New(`{{include "common"}}{{include "common"}}`)
+	p := parser.New(l)
+	tmpl, err := p.Parse()
 	if err != nil {
 		t.Fatalf("parse error: %v", err)
 	}

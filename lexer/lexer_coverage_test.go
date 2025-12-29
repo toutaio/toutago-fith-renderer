@@ -35,7 +35,7 @@ func TestLexer_PeekAhead(t *testing.T) {
 	}
 }
 
-func TestLexer_MultipleExpressions(t *testing.T) {
+func TestLexer_MultipleExpressions_Extended(t *testing.T) {
 	l := New("{{.a}}{{.b}}")
 	tokens, err := l.All()
 	if err != nil {
@@ -178,7 +178,7 @@ func TestLexer_AllOperators(t *testing.T) {
 	}
 }
 
-func TestLexer_Keywords(t *testing.T) {
+func TestLexer_Keywords_Extended(t *testing.T) {
 	keywords := map[string]TokenType{
 		"if":      TokenIf,
 		"else":    TokenElse,
