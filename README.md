@@ -1,5 +1,10 @@
 # Toutā Fíth Renderer
 
+[![CI](https://github.com/toutaio/toutago-fith-renderer/actions/workflows/ci.yml/badge.svg)](https://github.com/toutaio/toutago-fith-renderer/actions/workflows/ci.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/toutaio/toutago-fith-renderer.svg)](https://pkg.go.dev/github.com/toutaio/toutago-fith-renderer)
+[![Go Report Card](https://goreportcard.com/badge/github.com/toutaio/toutago-fith-renderer)](https://goreportcard.com/report/github.com/toutaio/toutago-fith-renderer)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A powerful, flexible template engine for Go inspired by Celtic craftsmanship.
 
 > **Fíth** (Old Irish): The art of weaving patterns - representing how templates weave data into beautiful output.

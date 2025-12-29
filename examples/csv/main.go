@@ -109,7 +109,7 @@ func main() {
 
 	// Example 4: Escaped CSV values
 	fmt.Println("=== Example 4: Escaped Values ===")
-	
+
 	// Register custom CSV escape function
 	engine.RegisterFunction("csvEscape", func(args ...interface{}) (interface{}, error) {
 		if len(args) != 1 {

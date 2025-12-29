@@ -67,17 +67,17 @@ func main() {
 </html>`
 
 	welcomeData := map[string]interface{}{
-		"AppName":      "MyApp",
-		"UserName":     "Alice",
-		"CompanyName":  "Tech Corp",
+		"AppName":        "MyApp",
+		"UserName":       "Alice",
+		"CompanyName":    "Tech Corp",
 		"CompanyAddress": "123 Tech St, San Francisco, CA",
 		"NextSteps": []string{
 			"Complete your profile",
 			"Connect with friends",
 			"Explore features",
 		},
-		"ActivationLink":   "https://example.com/activate/abc123",
-		"UnsubscribeLink":  "https://example.com/unsubscribe/abc123",
+		"ActivationLink":  "https://example.com/activate/abc123",
+		"UnsubscribeLink": "https://example.com/unsubscribe/abc123",
 	}
 
 	output, err := engine.RenderString(welcomeHTML, welcomeData)
@@ -167,9 +167,9 @@ func main() {
 </html>`
 
 	orderData := map[string]interface{}{
-		"OrderID":       "12345",
-		"CustomerName":  "Bob Smith",
-		"OrderDate":     time.Now(),
+		"OrderID":         "12345",
+		"CustomerName":    "Bob Smith",
+		"OrderDate":       time.Now(),
 		"ShippingAddress": "456 Main St, New York, NY 10001",
 		"Items": []map[string]interface{}{
 			{"Product": "Laptop", "Quantity": 1, "Price": 999.99, "Subtotal": 999.99},
@@ -177,8 +177,8 @@ func main() {
 			{"Product": "Keyboard", "Quantity": 1, "Price": 79.99, "Subtotal": 79.99},
 		},
 		"Shipping":     10.00,
-		"Tax":         113.00,
-		"Total":       1263.96,
+		"Tax":          113.00,
+		"Total":        1263.96,
 		"TrackingLink": "https://example.com/track/12345",
 	}
 
