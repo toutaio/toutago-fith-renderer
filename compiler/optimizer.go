@@ -74,10 +74,10 @@ func (o *Optimizer) optimizeIf(n *parser.IfNode) parser.Node {
 			}
 		}
 		// Condition is always false - return else branch or nothing
-		if n.Else != nil && len(n.Else) == 1 {
+		if len(n.Else) == 1 {
 			return o.optimizeNode(n.Else[0])
 		}
-		if n.Else != nil && len(n.Else) > 0 {
+		if len(n.Else) > 0 {
 			return &parser.IfNode{
 				Position:  n.Position,
 				Condition: &parser.LiteralNode{Position: n.Position, Value: false},

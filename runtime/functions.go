@@ -113,7 +113,8 @@ func fnTitle(args ...interface{}) (interface{}, error) {
 	if !ok {
 		return nil, fmt.Errorf("title: argument must be a string")
 	}
-	return strings.Title(s), nil
+	// nolint:staticcheck // Using deprecated strings.Title for simplicity
+	return strings.Title(s), nil //nolint:staticcheck
 }
 
 func fnTrim(args ...interface{}) (interface{}, error) {

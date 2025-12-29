@@ -115,7 +115,7 @@ func TestContext_Scopes(t *testing.T) {
 	}
 
 	// x should still be there
-	val, err = ctx.Get([]string{"x"})
+	_, err = ctx.Get([]string{"x"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

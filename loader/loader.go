@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 
 	"github.com/toutaio/toutago-fith-renderer/lexer"
 	"github.com/toutaio/toutago-fith-renderer/parser"
@@ -30,7 +29,7 @@ type FileSystemLoader struct {
 	baseDir    string
 	extensions []string
 	cache      *TemplateCache
-	mu         sync.RWMutex
+	// mu sync.RWMutex // Reserved for future use with concurrent cache operations
 }
 
 // NewFileSystemLoader creates a new filesystem-based template loader.

@@ -242,7 +242,7 @@ func (e *Engine) Config() Config {
 	return e.config
 }
 
-// Helper function to create an engine from an embedded filesystem.
+// NewWithFS creates an engine from an embedded filesystem.
 func NewWithFS(fsys fs.FS, extensions ...string) (*Engine, error) {
 	config := DefaultConfig()
 	config.TemplateFS = fsys
@@ -252,7 +252,7 @@ func NewWithFS(fsys fs.FS, extensions ...string) (*Engine, error) {
 	return New(config)
 }
 
-// Helper function to create an engine from a directory.
+// NewWithDir creates an engine from a directory.
 func NewWithDir(dir string, extensions ...string) (*Engine, error) {
 	config := DefaultConfig()
 	config.TemplateDir = dir
