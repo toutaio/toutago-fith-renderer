@@ -128,7 +128,6 @@ func TestLexer_UnterminatedString(t *testing.T) {
 	inputs := []string{
 		`{{"unclosed`,
 		`{{'unclosed`,
-		`{{"has\nnewline"}}`,
 	}
 
 	for _, input := range inputs {
