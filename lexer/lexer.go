@@ -101,100 +101,14 @@ func (l *Lexer) scanExpression() (Token, error) {
 		return l.makeToken(TokenCloseDelim, "}}"), nil
 	}
 
-	// Single character tokens
-	switch ch {
-	case '.':
-		l.advance()
-		return l.makeToken(TokenDot, "."), nil
-	case '+':
-		l.advance()
-		return l.makeToken(TokenPlus, "+"), nil
-	case '-':
-		l.advance()
-		return l.makeToken(TokenMinus, "-"), nil
-	case '*':
-		l.advance()
-		return l.makeToken(TokenMult, "*"), nil
-	case '/':
-		l.advance()
-		return l.makeToken(TokenDiv, "/"), nil
-	case '%':
-		l.advance()
-		return l.makeToken(TokenMod, "%"), nil
-	case ',':
-		l.advance()
-		return l.makeToken(TokenComma, ","), nil
-	case ':':
-		l.advance()
-		return l.makeToken(TokenColon, ":"), nil
-	case '(':
-		l.advance()
-		return l.makeToken(TokenLParen, "("), nil
-	case ')':
-		l.advance()
-		return l.makeToken(TokenRParen, ")"), nil
-	case '[':
-		l.advance()
-		return l.makeToken(TokenLBrack, "["), nil
-	case ']':
-		l.advance()
-		return l.makeToken(TokenRBrack, "]"), nil
+	// Try single character tokens
+	if tok, ok := l.trySingleCharToken(ch); ok {
+		return tok, nil
 	}
 
-	// Multi-character operators
-	if ch == '=' {
-		l.advance()
-		if l.peek() == '=' {
-			l.advance()
-			return l.makeToken(TokenEqual, "=="), nil
-		}
-		return l.makeToken(TokenAssign, "="), nil
-	}
-
-	if ch == '!' {
-		l.advance()
-		if l.peek() == '=' {
-			l.advance()
-			return l.makeToken(TokenNotEqual, "!="), nil
-		}
-		return l.makeToken(TokenNot, "!"), nil
-	}
-
-	if ch == '<' {
-		l.advance()
-		if l.peek() == '=' {
-			l.advance()
-			return l.makeToken(TokenLessEq, "<="), nil
-		}
-		return l.makeToken(TokenLess, "<"), nil
-	}
-
-	if ch == '>' {
-		l.advance()
-		if l.peek() == '=' {
-			l.advance()
-			return l.makeToken(TokenGreaterEq, ">="), nil
-		}
-		return l.makeToken(TokenGreater, ">"), nil
-	}
-
-	if ch == '&' {
-		l.advance()
-		if l.peek() == '&' {
-			l.advance()
-			return l.makeToken(TokenAnd, "&&"), nil
-		}
-		return l.errorToken("expected '&&', got '&'")
-	}
-
-	if ch == '|' {
-		l.advance()
-		if l.peek() == '|' {
-			l.advance()
-			return l.makeToken(TokenOr, "||"), nil
-		}
-		// Single | is pipe operator
-		return l.makeToken(TokenPipe, "|"), nil
+	// Try multi-character operators
+	if tok, err := l.tryMultiCharOperator(ch); tok.Type != "" || err != nil {
+		return tok, err
 	}
 
 	// String literals
@@ -214,6 +128,99 @@ func (l *Lexer) scanExpression() (Token, error) {
 
 	// Unknown character
 	return l.errorToken(fmt.Sprintf("unexpected character: %q", ch))
+}
+
+// trySingleCharToken attempts to scan a single character token.
+func (l *Lexer) trySingleCharToken(ch byte) (Token, bool) {
+	var tokType TokenType
+	var lexeme string
+
+	switch ch {
+	case '.':
+		tokType, lexeme = TokenDot, "."
+	case '+':
+		tokType, lexeme = TokenPlus, "+"
+	case '-':
+		tokType, lexeme = TokenMinus, "-"
+	case '*':
+		tokType, lexeme = TokenMult, "*"
+	case '/':
+		tokType, lexeme = TokenDiv, "/"
+	case '%':
+		tokType, lexeme = TokenMod, "%"
+	case ',':
+		tokType, lexeme = TokenComma, ","
+	case ':':
+		tokType, lexeme = TokenColon, ":"
+	case '(':
+		tokType, lexeme = TokenLParen, "("
+	case ')':
+		tokType, lexeme = TokenRParen, ")"
+	case '[':
+		tokType, lexeme = TokenLBrack, "["
+	case ']':
+		tokType, lexeme = TokenRBrack, "]"
+	default:
+		return Token{}, false
+	}
+
+	l.advance()
+	return l.makeToken(tokType, lexeme), true
+}
+
+// tryMultiCharOperator attempts to scan multi-character operators.
+func (l *Lexer) tryMultiCharOperator(ch byte) (Token, error) {
+	switch ch {
+	case '=':
+		l.advance()
+		if l.peek() == '=' {
+			l.advance()
+			return l.makeToken(TokenEqual, "=="), nil
+		}
+		return l.makeToken(TokenAssign, "="), nil
+
+	case '!':
+		l.advance()
+		if l.peek() == '=' {
+			l.advance()
+			return l.makeToken(TokenNotEqual, "!="), nil
+		}
+		return l.makeToken(TokenNot, "!"), nil
+
+	case '<':
+		l.advance()
+		if l.peek() == '=' {
+			l.advance()
+			return l.makeToken(TokenLessEq, "<="), nil
+		}
+		return l.makeToken(TokenLess, "<"), nil
+
+	case '>':
+		l.advance()
+		if l.peek() == '=' {
+			l.advance()
+			return l.makeToken(TokenGreaterEq, ">="), nil
+		}
+		return l.makeToken(TokenGreater, ">"), nil
+
+	case '&':
+		l.advance()
+		if l.peek() == '&' {
+			l.advance()
+			return l.makeToken(TokenAnd, "&&"), nil
+		}
+		return Token{}, l.errorToken("expected '&&', got '&'")
+
+	case '|':
+		l.advance()
+		if l.peek() == '|' {
+			l.advance()
+			return l.makeToken(TokenOr, "||"), nil
+		}
+		return l.makeToken(TokenPipe, "|"), nil
+	}
+
+	return Token{}, nil
 }
 
 // scanString scans a string literal.

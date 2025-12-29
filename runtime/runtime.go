@@ -339,23 +339,58 @@ func (r *Runtime) evaluateBinaryOp(node *parser.BinaryOpNode) (interface{}, erro
 		return nil, err
 	}
 
-	switch node.Operator {
+	return r.applyBinaryOperator(node.Operator, left, right)
+}
+
+// applyBinaryOperator applies a binary operator to two values.
+func (r *Runtime) applyBinaryOperator(op lexer.TokenType, left, right interface{}) (interface{}, error) {
+	// Comparison operators
+	if result, ok := r.tryComparisonOp(op, left, right); ok {
+		return result, nil
+	}
+
+	// Logical operators
+	if result, ok := r.tryLogicalOp(op, left, right); ok {
+		return result, nil
+	}
+
+	// Arithmetic operators
+	return r.tryArithmeticOp(op, left, right)
+}
+
+// tryComparisonOp attempts to apply a comparison operator.
+func (r *Runtime) tryComparisonOp(op lexer.TokenType, left, right interface{}) (interface{}, bool) {
+	switch op {
 	case lexer.TokenEqual:
-		return compareEqual(left, right), nil
+		return compareEqual(left, right), true
 	case lexer.TokenNotEqual:
-		return !compareEqual(left, right), nil
+		return !compareEqual(left, right), true
 	case lexer.TokenLess:
-		return compareLess(left, right), nil
+		return compareLess(left, right), true
 	case lexer.TokenGreater:
-		return compareLess(right, left), nil
+		return compareLess(right, left), true
 	case lexer.TokenLessEq:
-		return !compareLess(right, left), nil
+		return !compareLess(right, left), true
 	case lexer.TokenGreaterEq:
-		return !compareLess(left, right), nil
+		return !compareLess(left, right), true
+	}
+	return nil, false
+}
+
+// tryLogicalOp attempts to apply a logical operator.
+func (r *Runtime) tryLogicalOp(op lexer.TokenType, left, right interface{}) (interface{}, bool) {
+	switch op {
 	case lexer.TokenAnd:
-		return IsTruthy(left) && IsTruthy(right), nil
+		return IsTruthy(left) && IsTruthy(right), true
 	case lexer.TokenOr:
-		return IsTruthy(left) || IsTruthy(right), nil
+		return IsTruthy(left) || IsTruthy(right), true
+	}
+	return nil, false
+}
+
+// tryArithmeticOp attempts to apply an arithmetic operator.
+func (r *Runtime) tryArithmeticOp(op lexer.TokenType, left, right interface{}) (interface{}, error) {
+	switch op {
 	case lexer.TokenPlus:
 		return addValues(left, right)
 	case lexer.TokenMinus:
@@ -367,7 +402,7 @@ func (r *Runtime) evaluateBinaryOp(node *parser.BinaryOpNode) (interface{}, erro
 	case lexer.TokenMod:
 		return modValues(left, right)
 	default:
-		return nil, fmt.Errorf("unsupported operator: %v", node.Operator)
+		return nil, fmt.Errorf("unsupported operator: %v", op)
 	}
 }
 

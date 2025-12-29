@@ -183,6 +183,7 @@ jobs:
           cache: true
       
       - name: Build
+        shell: bash
         run: |
           # Build each package individually to handle packages without buildable files
           for pkg in $(go list ./... | grep -v /examples | grep -v /benchmarks); do

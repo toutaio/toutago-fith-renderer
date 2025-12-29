@@ -166,77 +166,8 @@ func (c *Compiler) resolveDependencies(tmpl *parser.Template) ([]string, error) 
 	var resolve func(*parser.Template) error
 	resolve = func(t *parser.Template) error {
 		for _, node := range t.Nodes {
-			switch n := node.(type) {
-			case *parser.IncludeNode:
-				if !visited[n.Template] {
-					visited[n.Template] = true
-					deps = append(deps, n.Template)
-
-					// Verify include exists
-					if !c.loader.Exists(n.Template) {
-						return fmt.Errorf("included template %q not found", n.Template)
-					}
-
-					// Load and recursively resolve
-					included, err := c.loader.Load(n.Template)
-					if err != nil {
-						return fmt.Errorf("failed to load included template %q: %w", n.Template, err)
-					}
-					if err := resolve(included); err != nil {
-						return err
-					}
-				}
-
-			case *parser.ExtendsNode:
-				if !visited[n.Template] {
-					visited[n.Template] = true
-					deps = append(deps, n.Template)
-
-					// Verify layout exists
-					if !c.loader.Exists(n.Template) {
-						return fmt.Errorf("layout template %q not found", n.Template)
-					}
-
-					// Load and recursively resolve
-					layout, err := c.loader.Load(n.Template)
-					if err != nil {
-						return fmt.Errorf("failed to load layout %q: %w", n.Template, err)
-					}
-					if err := resolve(layout); err != nil {
-						return err
-					}
-				}
-
-			case *parser.IfNode:
-				// Check then and else branches
-				for _, child := range n.Then {
-					if err := resolve(&parser.Template{Nodes: []parser.Node{child}}); err != nil {
-						return err
-					}
-				}
-				if n.Else != nil {
-					for _, child := range n.Else {
-						if err := resolve(&parser.Template{Nodes: []parser.Node{child}}); err != nil {
-							return err
-						}
-					}
-				}
-
-			case *parser.RangeNode:
-				// Check loop body
-				for _, child := range n.Body {
-					if err := resolve(&parser.Template{Nodes: []parser.Node{child}}); err != nil {
-						return err
-					}
-				}
-
-			case *parser.BlockNode:
-				// Check block body
-				for _, child := range n.Body {
-					if err := resolve(&parser.Template{Nodes: []parser.Node{child}}); err != nil {
-						return err
-					}
-				}
+			if err := c.resolveNodeDependencies(node, &deps, visited, resolve); err != nil {
+				return err
 			}
 		}
 		return nil
@@ -247,4 +178,70 @@ func (c *Compiler) resolveDependencies(tmpl *parser.Template) ([]string, error) 
 	}
 
 	return deps, nil
+}
+
+// resolveNodeDependencies resolves dependencies for a single node.
+func (c *Compiler) resolveNodeDependencies(node parser.Node, deps *[]string, visited map[string]bool, resolve func(*parser.Template) error) error {
+	switch n := node.(type) {
+	case *parser.IncludeNode:
+		return c.resolveTemplateDep(n.Template, deps, visited, resolve)
+
+	case *parser.ExtendsNode:
+		return c.resolveTemplateDep(n.Template, deps, visited, resolve)
+
+	case *parser.IfNode:
+		return c.resolveIfNodeDeps(n, resolve)
+
+	case *parser.RangeNode:
+		return c.resolveChildren(n.Body, resolve)
+
+	case *parser.BlockNode:
+		return c.resolveChildren(n.Body, resolve)
+	}
+
+	return nil
+}
+
+// resolveTemplateDep resolves a template dependency (include or extends).
+func (c *Compiler) resolveTemplateDep(templateName string, deps *[]string, visited map[string]bool, resolve func(*parser.Template) error) error {
+	if visited[templateName] {
+		return nil
+	}
+
+	visited[templateName] = true
+	*deps = append(*deps, templateName)
+
+	if !c.loader.Exists(templateName) {
+		return fmt.Errorf("template %q not found", templateName)
+	}
+
+	tmpl, err := c.loader.Load(templateName)
+	if err != nil {
+		return fmt.Errorf("failed to load template %q: %w", templateName, err)
+	}
+
+	return resolve(tmpl)
+}
+
+// resolveIfNodeDeps resolves dependencies in if node branches.
+func (c *Compiler) resolveIfNodeDeps(n *parser.IfNode, resolve func(*parser.Template) error) error {
+	if err := c.resolveChildren(n.Then, resolve); err != nil {
+		return err
+	}
+
+	if n.Else != nil {
+		return c.resolveChildren(n.Else, resolve)
+	}
+
+	return nil
+}
+
+// resolveChildren resolves dependencies in child nodes.
+func (c *Compiler) resolveChildren(children []parser.Node, resolve func(*parser.Template) error) error {
+	for _, child := range children {
+		if err := resolve(&parser.Template{Nodes: []parser.Node{child}}); err != nil {
+			return err
+		}
+	}
+	return nil
 }
