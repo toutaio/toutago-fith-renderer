@@ -1,6 +1,8 @@
 package compiler
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/toutaio/toutago-fith-renderer/loader"
@@ -10,16 +12,17 @@ import (
 // Additional tests for improved coverage
 
 func TestCompiler_ResolveDependenciesWithNested(t *testing.T) {
-	// Create mock loader with nested dependencies
-	mockLoader := loader.NewMemoryLoader()
+	tmpDir := t.TempDir()
 	
-	mockLoader.AddTemplate("main", "{{include \"partial\"}}")
-	mockLoader.AddTemplate("partial", "{{include \"nested\"}}")
-	mockLoader.AddTemplate("nested", "content")
+	// Create templates
+	os.WriteFile(filepath.Join(tmpDir, "main.html"), []byte(`{{include "partial"}}`), 0644)
+	os.WriteFile(filepath.Join(tmpDir, "partial.html"), []byte(`{{include "nested"}}`), 0644)
+	os.WriteFile(filepath.Join(tmpDir, "nested.html"), []byte("content"), 0644)
 	
-	c := New(mockLoader)
+	ldr := loader.NewFileSystemLoader(tmpDir, []string{".html"})
+	c := New(ldr)
 	
-	tmpl, err := parser.New("{{include \"main\"}}").Parse()
+	tmpl, err := parser.New(`{{include "main"}}`).Parse()
 	if err != nil {
 		t.Fatalf("parse error: %v", err)
 	}
@@ -35,14 +38,15 @@ func TestCompiler_ResolveDependenciesWithNested(t *testing.T) {
 }
 
 func TestCompiler_ResolveExtendsChain(t *testing.T) {
-	mockLoader := loader.NewMemoryLoader()
+	tmpDir := t.TempDir()
 	
-	mockLoader.AddTemplate("base", "{{block \"content\"}}base{{end}}")
-	mockLoader.AddTemplate("middle", "{{extends \"base\"}}{{block \"content\"}}middle{{end}}")
+	os.WriteFile(filepath.Join(tmpDir, "base.html"), []byte(`{{block "content"}}base{{end}}`), 0644)
+	os.WriteFile(filepath.Join(tmpDir, "middle.html"), []byte(`{{extends "base"}}{{block "content"}}middle{{end}}`), 0644)
 	
-	c := New(mockLoader)
+	ldr := loader.NewFileSystemLoader(tmpDir, []string{".html"})
+	c := New(ldr)
 	
-	tmpl, err := parser.New("{{extends \"middle\"}}").Parse()
+	tmpl, err := parser.New(`{{extends "middle"}}`).Parse()
 	if err != nil {
 		t.Fatalf("parse error: %v", err)
 	}
@@ -58,10 +62,11 @@ func TestCompiler_ResolveExtendsChain(t *testing.T) {
 }
 
 func TestCompiler_MissingTemplate(t *testing.T) {
-	mockLoader := loader.NewMemoryLoader()
-	c := New(mockLoader)
+	tmpDir := t.TempDir()
+	ldr := loader.NewFileSystemLoader(tmpDir, []string{".html"})
+	c := New(ldr)
 	
-	tmpl, err := parser.New("{{include \"missing\"}}").Parse()
+	tmpl, err := parser.New(`{{include "missing"}}`).Parse()
 	if err != nil {
 		t.Fatalf("parse error: %v", err)
 	}
@@ -73,12 +78,13 @@ func TestCompiler_MissingTemplate(t *testing.T) {
 }
 
 func TestCompiler_IfNodeDependencies(t *testing.T) {
-	mockLoader := loader.NewMemoryLoader()
-	mockLoader.AddTemplate("partial", "content")
+	tmpDir := t.TempDir()
+	os.WriteFile(filepath.Join(tmpDir, "partial.html"), []byte("content"), 0644)
 	
-	c := New(mockLoader)
+	ldr := loader.NewFileSystemLoader(tmpDir, []string{".html"})
+	c := New(ldr)
 	
-	tmpl, err := parser.New("{{if .x}}{{include \"partial\"}}{{end}}").Parse()
+	tmpl, err := parser.New(`{{if .x}}{{include "partial"}}{{end}}`).Parse()
 	if err != nil {
 		t.Fatalf("parse error: %v", err)
 	}
@@ -94,12 +100,13 @@ func TestCompiler_IfNodeDependencies(t *testing.T) {
 }
 
 func TestCompiler_RangeNodeDependencies(t *testing.T) {
-	mockLoader := loader.NewMemoryLoader()
-	mockLoader.AddTemplate("item", "item content")
+	tmpDir := t.TempDir()
+	os.WriteFile(filepath.Join(tmpDir, "item.html"), []byte("item content"), 0644)
 	
-	c := New(mockLoader)
+	ldr := loader.NewFileSystemLoader(tmpDir, []string{".html"})
+	c := New(ldr)
 	
-	tmpl, err := parser.New("{{range .items}}{{include \"item\"}}{{end}}").Parse()
+	tmpl, err := parser.New(`{{range .items}}{{include "item"}}{{end}}`).Parse()
 	if err != nil {
 		t.Fatalf("parse error: %v", err)
 	}
@@ -115,12 +122,13 @@ func TestCompiler_RangeNodeDependencies(t *testing.T) {
 }
 
 func TestCompiler_BlockNodeDependencies(t *testing.T) {
-	mockLoader := loader.NewMemoryLoader()
-	mockLoader.AddTemplate("widget", "widget content")
+	tmpDir := t.TempDir()
+	os.WriteFile(filepath.Join(tmpDir, "widget.html"), []byte("widget content"), 0644)
 	
-	c := New(mockLoader)
+	ldr := loader.NewFileSystemLoader(tmpDir, []string{".html"})
+	c := New(ldr)
 	
-	tmpl, err := parser.New("{{block \"main\"}}{{include \"widget\"}}{{end}}").Parse()
+	tmpl, err := parser.New(`{{block "main"}}{{include "widget"}}{{end}}`).Parse()
 	if err != nil {
 		t.Fatalf("parse error: %v", err)
 	}
@@ -136,13 +144,14 @@ func TestCompiler_BlockNodeDependencies(t *testing.T) {
 }
 
 func TestCompiler_DuplicateDependencies(t *testing.T) {
-	mockLoader := loader.NewMemoryLoader()
-	mockLoader.AddTemplate("common", "common content")
+	tmpDir := t.TempDir()
+	os.WriteFile(filepath.Join(tmpDir, "common.html"), []byte("common content"), 0644)
 	
-	c := New(mockLoader)
+	ldr := loader.NewFileSystemLoader(tmpDir, []string{".html"})
+	c := New(ldr)
 	
 	// Include same template twice
-	tmpl, err := parser.New("{{include \"common\"}}{{include \"common\"}}").Parse()
+	tmpl, err := parser.New(`{{include "common"}}{{include "common"}}`).Parse()
 	if err != nil {
 		t.Fatalf("parse error: %v", err)
 	}
@@ -159,7 +168,9 @@ func TestCompiler_DuplicateDependencies(t *testing.T) {
 }
 
 func TestCompiler_CacheKey(t *testing.T) {
-	c := New(loader.NewMemoryLoader())
+	tmpDir := t.TempDir()
+	ldr := loader.NewFileSystemLoader(tmpDir, []string{".html"})
+	c := New(ldr)
 	
 	key1 := c.generateCacheKey("test")
 	key2 := c.generateCacheKey("test")
