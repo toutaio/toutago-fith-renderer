@@ -107,7 +107,7 @@ func (l *Lexer) scanExpression() (Token, error) {
 	}
 
 	// Try multi-character operators
-	if tok, err := l.tryMultiCharOperator(ch); tok.Type != "" || err != nil {
+	if tok, err := l.tryMultiCharOperator(ch); tok.Type != 0 || err != nil {
 		return tok, err
 	}
 
@@ -209,7 +209,8 @@ func (l *Lexer) tryMultiCharOperator(ch byte) (Token, error) {
 			l.advance()
 			return l.makeToken(TokenAnd, "&&"), nil
 		}
-		return Token{}, l.errorToken("expected '&&', got '&'")
+		tok, err := l.errorToken("expected '&&', got '&'")
+		return tok, err
 
 	case '|':
 		l.advance()
