@@ -36,8 +36,16 @@ jobs:
       - name: Verify dependencies
         run: go mod verify
       
+      - name: Debug - List test files
+        run: |
+          echo "=== Test files in repository ==="
+          find . -name "*_test.go" -not -path "./examples/*" | sort
+          echo ""
+          echo "=== Packages to test ==="
+          go list ./... | grep -v /examples
+      
       - name: Run tests with race detector
-        run: go test -race -timeout 10m $(go list ./... | grep -v /examples)
+        run: go test -race -timeout 10m -v $(go list ./... | grep -v /examples) 2>&1 | tee test_output.log
 
   coverage:
     name: Code Coverage
@@ -54,8 +62,15 @@ jobs:
           go-version: '1.24.11'
           cache: true
       
+      - name: Debug - Check Go version and environment
+        run: |
+          go version
+          go env
+          echo "=== Test files ==="
+          find . -name "*_test.go" -not -path "./examples/*" | wc -l
+      
       - name: Run tests with coverage
-        run: go test -coverprofile=coverage.out -covermode=atomic $(go list ./... | grep -v /examples)
+        run: go test -coverprofile=coverage.out -covermode=atomic -v $(go list ./... | grep -v /examples) 2>&1 | tee coverage_output.log
       
       - name: Generate coverage report
         run: |
