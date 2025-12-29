@@ -43,9 +43,16 @@ jobs:
           echo ""
           echo "=== Packages to test ==="
           go list ./... | grep -v /examples
+        shell: bash
       
-      - name: Run tests with race detector
+      - name: Run tests with race detector (Unix)
+        if: runner.os != 'Windows'
         run: go test -race -timeout 10m -v $(go list ./... | grep -v /examples) 2>&1 | tee test_output.log
+      
+      - name: Run tests without race detector (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: go test -timeout 10m -v $(go list ./... | grep -v /examples) 2>&1 | tee test_output.log
 
   coverage:
     name: Code Coverage
