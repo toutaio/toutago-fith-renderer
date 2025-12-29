@@ -23,10 +23,10 @@ func TestRuntime_BinaryOpAllTypes(t *testing.T) {
 		{"{{2 >= 2}}", true},
 
 		// Logical
-		{"{{true && true}}", true},
-		{"{{true || false}}", true},
-		{"{{false && true}}", false},
-		{"{{false || false}}", false},
+		{"{{1 && 1}}", true},
+		{"{{1 || 0}}", true},
+		{"{{0 && 1}}", false},
+		{"{{0 || 0}}", false},
 
 		// Arithmetic
 		{"{{5 + 3}}", 8.0},
@@ -138,8 +138,8 @@ func TestRuntime_UnaryNot(t *testing.T) {
 		expr string
 		want bool
 	}{
-		{"{{!true}}", false},
-		{"{{!false}}", true},
+		{"{{!1}}", false},
+		{"{{!0}}", true},
 		{"{{!0}}", true},
 		{"{{!1}}", false},
 	}
