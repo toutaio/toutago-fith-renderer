@@ -16,7 +16,6 @@ linters-settings:
   goimports:
     local-prefixes: github.com/toutaio/toutago-fith-renderer
   govet:
-    check-shadowing: true
   lll:
     line-length: 120
   misspell:
@@ -28,7 +27,7 @@ linters:
     - bodyclose
     - dupl
     - errcheck
-    - exportloopref
+    # - exportloopref # Deprecated in Go 1.22+
     - goconst
     - gocritic
     - gocyclo

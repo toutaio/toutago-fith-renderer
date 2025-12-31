@@ -6,6 +6,9 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // Function represents a template function.
@@ -113,8 +116,8 @@ func fnTitle(args ...interface{}) (interface{}, error) {
 	if !ok {
 		return nil, fmt.Errorf("title: argument must be a string")
 	}
-	// nolint:staticcheck // Using deprecated strings.Title for simplicity
-	return strings.Title(s), nil //nolint:staticcheck
+	caser := cases.Title(language.English)
+	return caser.String(s), nil
 }
 
 func fnTrim(args ...interface{}) (interface{}, error) {
