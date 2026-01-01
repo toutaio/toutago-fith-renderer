@@ -8,7 +8,7 @@
 //	import "github.com/toutaio/toutago-fith-renderer"
 //
 //	// Create a new engine
-//	engine := fith.New(fith.Config{
+//	engine := fith.New(&fith.Config{
 //	    TemplateDir: "templates",
 //	})
 //
@@ -52,7 +52,7 @@ type Engine struct {
 }
 
 // New creates a new Fíth template engine with the given configuration.
-func New(config Config) (*Engine, error) {
+func New(config *Config) (*Engine, error) {
 	// Apply defaults
 	config.applyDefaults()
 
@@ -62,14 +62,12 @@ func New(config Config) (*Engine, error) {
 	}
 
 	engine := &Engine{
-		config:    config,
+		config:    *config,
 		functions: runtime.NewFunctionRegistry(),
 	}
 
 	// Initialize loader based on config
-	if err := engine.initializeLoader(); err != nil {
-		return nil, WrapError(ErrorTypeLoader, "failed to initialize loader", err)
-	}
+	engine.initializeLoader()
 
 	// Initialize compiler
 	engine.compiler = compiler.NewCompiler(engine.loader)
@@ -79,11 +77,12 @@ func New(config Config) (*Engine, error) {
 
 // NewWithDefaults creates a new Fíth engine with default configuration.
 func NewWithDefaults() (*Engine, error) {
-	return New(DefaultConfig())
+	config := DefaultConfig()
+	return New(&config)
 }
 
 // initializeLoader sets up the template loader based on configuration.
-func (e *Engine) initializeLoader() error {
+func (e *Engine) initializeLoader() {
 	if e.config.TemplateFS != nil {
 		// Use embedded filesystem
 		e.loader = loader.NewEmbedLoader(e.config.TemplateFS, ".", e.config.Extensions)
@@ -91,7 +90,6 @@ func (e *Engine) initializeLoader() error {
 		// Use directory loader
 		e.loader = loader.NewFileSystemLoader(e.config.TemplateDir, e.config.Extensions)
 	}
-	return nil
 }
 
 // Render renders a template with the given data.
@@ -249,7 +247,7 @@ func NewWithFS(fsys fs.FS, extensions ...string) (*Engine, error) {
 	if len(extensions) > 0 {
 		config.Extensions = extensions
 	}
-	return New(config)
+	return New(&config)
 }
 
 // NewWithDir creates an engine from a directory.
@@ -259,5 +257,5 @@ func NewWithDir(dir string, extensions ...string) (*Engine, error) {
 	if len(extensions) > 0 {
 		config.Extensions = extensions
 	}
-	return New(config)
+	return New(&config)
 }

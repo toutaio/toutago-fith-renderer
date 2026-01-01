@@ -144,7 +144,7 @@ func TestLexer_Keywords(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
 			l := New(tt.input)
-			l.NextToken() // Skip {{
+			_, _ = l.NextToken() // Skip {{
 
 			tok, err := l.NextToken()
 			if err != nil {
@@ -163,12 +163,27 @@ func TestLexer_Operators(t *testing.T) {
 		input string
 		want  []TokenType
 	}{
-		{"{{.A == .B}}", []TokenType{TokenOpenDelim, TokenDot, TokenIdent, TokenEqual, TokenDot, TokenIdent, TokenCloseDelim}},
-		{"{{.A != .B}}", []TokenType{TokenOpenDelim, TokenDot, TokenIdent, TokenNotEqual, TokenDot, TokenIdent, TokenCloseDelim}},
+		{
+			"{{.A == .B}}",
+			[]TokenType{TokenOpenDelim, TokenDot, TokenIdent, TokenEqual, TokenDot, TokenIdent, TokenCloseDelim},
+		},
+		{
+			"{{.A != .B}}",
+			[]TokenType{TokenOpenDelim, TokenDot, TokenIdent, TokenNotEqual, TokenDot, TokenIdent, TokenCloseDelim},
+		},
 		{"{{.A < .B}}", []TokenType{TokenOpenDelim, TokenDot, TokenIdent, TokenLess, TokenDot, TokenIdent, TokenCloseDelim}},
-		{"{{.A > .B}}", []TokenType{TokenOpenDelim, TokenDot, TokenIdent, TokenGreater, TokenDot, TokenIdent, TokenCloseDelim}},
-		{"{{.A <= .B}}", []TokenType{TokenOpenDelim, TokenDot, TokenIdent, TokenLessEq, TokenDot, TokenIdent, TokenCloseDelim}},
-		{"{{.A >= .B}}", []TokenType{TokenOpenDelim, TokenDot, TokenIdent, TokenGreaterEq, TokenDot, TokenIdent, TokenCloseDelim}},
+		{
+			"{{.A > .B}}",
+			[]TokenType{TokenOpenDelim, TokenDot, TokenIdent, TokenGreater, TokenDot, TokenIdent, TokenCloseDelim},
+		},
+		{
+			"{{.A <= .B}}",
+			[]TokenType{TokenOpenDelim, TokenDot, TokenIdent, TokenLessEq, TokenDot, TokenIdent, TokenCloseDelim},
+		},
+		{
+			"{{.A >= .B}}",
+			[]TokenType{TokenOpenDelim, TokenDot, TokenIdent, TokenGreaterEq, TokenDot, TokenIdent, TokenCloseDelim},
+		},
 		{"{{.A && .B}}", []TokenType{TokenOpenDelim, TokenDot, TokenIdent, TokenAnd, TokenDot, TokenIdent, TokenCloseDelim}},
 		{"{{.A || .B}}", []TokenType{TokenOpenDelim, TokenDot, TokenIdent, TokenOr, TokenDot, TokenIdent, TokenCloseDelim}},
 		{"{{!.Active}}", []TokenType{TokenOpenDelim, TokenNot, TokenDot, TokenIdent, TokenCloseDelim}},
@@ -205,7 +220,7 @@ func TestLexer_StringLiterals(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
 			l := New(tt.input)
-			l.NextToken() // Skip {{
+			_, _ = l.NextToken() // Skip {{
 
 			tok, err := l.NextToken()
 			if err != nil {
@@ -238,7 +253,7 @@ func TestLexer_Numbers(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
 			l := New(tt.input)
-			l.NextToken() // Skip {{
+			_, _ = l.NextToken() // Skip {{
 
 			tok, err := l.NextToken()
 			if err != nil {
@@ -372,7 +387,7 @@ func TestLexer_ErrorUnterminatedString(t *testing.T) {
 	input := `{{"unterminated}`
 	l := New(input)
 
-	l.NextToken() // {{
+	_, _ = l.NextToken() // {{
 	_, err := l.NextToken()
 
 	if err == nil {
@@ -385,7 +400,7 @@ func TestLexer_SpecialLoopVars(t *testing.T) {
 	l := New(input)
 
 	// Should tokenize @index, @first, @last as identifiers
-	l.NextToken() // {{
+	_, _ = l.NextToken() // {{
 	tok, _ := l.NextToken()
 
 	if tok.Type != TokenIdent {
@@ -401,7 +416,7 @@ func BenchmarkLexer_SimpleText(b *testing.B) {
 	input := "Hello, World! This is some template text."
 	for i := 0; i < b.N; i++ {
 		l := New(input)
-		l.All()
+		_, _ = l.All()
 	}
 }
 
@@ -409,7 +424,7 @@ func BenchmarkLexer_SimpleVariable(b *testing.B) {
 	input := "{{.Name}}"
 	for i := 0; i < b.N; i++ {
 		l := New(input)
-		l.All()
+		_, _ = l.All()
 	}
 }
 
@@ -425,7 +440,7 @@ func BenchmarkLexer_ComplexTemplate(b *testing.B) {
 	`
 	for i := 0; i < b.N; i++ {
 		l := New(input)
-		l.All()
+		_, _ = l.All()
 	}
 }
 
@@ -515,8 +530,8 @@ func TestLexer_Assignment(t *testing.T) {
 	input := "{{name = .User.Name}}"
 	l := New(input)
 
-	l.NextToken() // {{
-	l.NextToken() // name
+	_, _ = l.NextToken() // {{
+	_, _ = l.NextToken() // name
 
 	tok, _ := l.NextToken()
 	if tok.Type != TokenAssign {

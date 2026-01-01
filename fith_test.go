@@ -58,7 +58,7 @@ func TestNew(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := New(tt.config)
+			_, err := New(&tt.config)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -212,7 +212,7 @@ func TestRender(t *testing.T) {
 
 	for name, content := range templates {
 		path := filepath.Join(tmpDir, name)
-		if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+		if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
 			t.Fatalf("failed to create test template: %v", err)
 		}
 	}
@@ -329,7 +329,7 @@ func TestExists(t *testing.T) {
 
 	// Create a test template
 	path := filepath.Join(tmpDir, "test.html")
-	if err := os.WriteFile(path, []byte("test"), 0644); err != nil {
+	if err := os.WriteFile(path, []byte("test"), 0o644); err != nil {
 		t.Fatalf("failed to create test template: %v", err)
 	}
 
@@ -352,7 +352,7 @@ func TestClearCache(t *testing.T) {
 
 	// Create a test template
 	path := filepath.Join(tmpDir, "test.html")
-	if err := os.WriteFile(path, []byte("Hello {{.Name}}!"), 0644); err != nil {
+	if err := os.WriteFile(path, []byte("Hello {{.Name}}!"), 0o644); err != nil {
 		t.Fatalf("failed to create test template: %v", err)
 	}
 
@@ -388,7 +388,7 @@ func TestConfig(t *testing.T) {
 		MaxIncludeDepth: 50,
 	}
 
-	engine, err := New(config)
+	engine, err := New(&config)
 	if err != nil {
 		t.Fatalf("New() error = %v", err)
 	}
@@ -430,7 +430,7 @@ func BenchmarkRenderWithCache(b *testing.B) {
 
 	path := filepath.Join(tmpDir, "bench.html")
 	content := "Hello {{.Name}}! You have {{.Count}} messages."
-	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
 		b.Fatalf("failed to create test template: %v", err)
 	}
 

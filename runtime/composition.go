@@ -75,7 +75,10 @@ func (r *CompositionRuntime) findExtendsNode(tmpl *parser.Template) *parser.Exte
 }
 
 // executeWithExtends handles template inheritance.
-func (r *CompositionRuntime) executeWithExtends(child *parser.Template, extendsNode *parser.ExtendsNode) (string, error) {
+func (r *CompositionRuntime) executeWithExtends(
+	child *parser.Template,
+	extendsNode *parser.ExtendsNode,
+) (string, error) {
 	// Collect blocks from child template
 	r.collectBlocks(child)
 

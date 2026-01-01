@@ -181,7 +181,12 @@ func (c *Compiler) resolveDependencies(tmpl *parser.Template) ([]string, error) 
 }
 
 // resolveNodeDependencies resolves dependencies for a single node.
-func (c *Compiler) resolveNodeDependencies(node parser.Node, deps *[]string, visited map[string]bool, resolve func(*parser.Template) error) error {
+func (c *Compiler) resolveNodeDependencies(
+	node parser.Node,
+	deps *[]string,
+	visited map[string]bool,
+	resolve func(*parser.Template) error,
+) error {
 	switch n := node.(type) {
 	case *parser.IncludeNode:
 		return c.resolveTemplateDep(n.Template, deps, visited, resolve)
@@ -203,7 +208,12 @@ func (c *Compiler) resolveNodeDependencies(node parser.Node, deps *[]string, vis
 }
 
 // resolveTemplateDep resolves a template dependency (include or extends).
-func (c *Compiler) resolveTemplateDep(templateName string, deps *[]string, visited map[string]bool, resolve func(*parser.Template) error) error {
+func (c *Compiler) resolveTemplateDep(
+	templateName string,
+	deps *[]string,
+	visited map[string]bool,
+	resolve func(*parser.Template) error,
+) error {
 	if visited[templateName] {
 		return nil
 	}

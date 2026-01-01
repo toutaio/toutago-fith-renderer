@@ -23,7 +23,7 @@ func main() {
 	createHTMLTemplates(tmpDir)
 
 	// Create engine
-	engine, err := fith.New(fith.Config{
+	engine, err := fith.New(&fith.Config{
 		TemplateDir: tmpDir,
 		Extensions:  []string{".html"},
 	})

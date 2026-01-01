@@ -333,7 +333,7 @@ func TestRuntime_RangeMap(t *testing.T) {
 	}
 
 	// Should contain both key-value pairs
-	if len(output) == 0 {
+	if output == "" {
 		t.Error("expected non-empty output")
 	}
 }
@@ -454,7 +454,7 @@ func TestRuntime_ComplexTemplate(t *testing.T) {
 	}
 
 	// Just check it contains expected parts
-	if len(output) == 0 {
+	if output == "" {
 		t.Error("expected non-empty output")
 	}
 

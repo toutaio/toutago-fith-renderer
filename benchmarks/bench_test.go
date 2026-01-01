@@ -22,7 +22,7 @@ func BenchmarkSimpleVariable(b *testing.B) {
 		p := parser.New(lex)
 		tmpl, _ := p.Parse()
 		ctx := runtime.NewContext(data)
-		runtime.Execute(tmpl, ctx)
+		_, _ = runtime.Execute(tmpl, ctx)
 	}
 }
 
@@ -41,7 +41,7 @@ func BenchmarkSimpleVariable_Cached(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		ctx := runtime.NewContext(data)
-		runtime.Execute(tmpl, ctx)
+		_, _ = runtime.Execute(tmpl, ctx)
 	}
 }
 
@@ -71,7 +71,7 @@ func BenchmarkComplexTemplate(b *testing.B) {
 		p := parser.New(lex)
 		tmpl, _ := p.Parse()
 		ctx := runtime.NewContext(data)
-		runtime.Execute(tmpl, ctx)
+		_, _ = runtime.Execute(tmpl, ctx)
 	}
 }
 
@@ -103,7 +103,7 @@ func BenchmarkComplexTemplate_Cached(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		ctx := runtime.NewContext(data)
-		runtime.Execute(tmpl, ctx)
+		_, _ = runtime.Execute(tmpl, ctx)
 	}
 }
 
@@ -127,7 +127,7 @@ func BenchmarkNestedAccess(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		ctx := runtime.NewContext(data)
-		runtime.Execute(tmpl, ctx)
+		_, _ = runtime.Execute(tmpl, ctx)
 	}
 }
 
@@ -146,7 +146,7 @@ func BenchmarkFilterPipeline(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		ctx := runtime.NewContext(data)
-		runtime.Execute(tmpl, ctx)
+		_, _ = runtime.Execute(tmpl, ctx)
 	}
 }
 
@@ -172,7 +172,7 @@ func BenchmarkLargeLoop(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		ctx := runtime.NewContext(data)
-		runtime.Execute(tmpl, ctx)
+		_, _ = runtime.Execute(tmpl, ctx)
 	}
 }
 
@@ -218,7 +218,7 @@ func BenchmarkParser(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		lex := lexer.New(template)
 		p := parser.New(lex)
-		p.Parse()
+		_, _ = p.Parse()
 	}
 }
 
@@ -250,7 +250,7 @@ func BenchmarkCompiler(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		c.ClearCache()
-		c.Compile("test")
+		_, _ = c.Compile("test")
 	}
 }
 
@@ -274,7 +274,7 @@ func BenchmarkOutputBuilder(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		ctx := runtime.NewContext(data)
-		runtime.Execute(tmpl, ctx)
+		_, _ = runtime.Execute(tmpl, ctx)
 	}
 }
 
@@ -293,7 +293,7 @@ func BenchmarkFunctionCalls(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		ctx := runtime.NewContext(data)
-		runtime.Execute(tmpl, ctx)
+		_, _ = runtime.Execute(tmpl, ctx)
 	}
 }
 
@@ -312,6 +312,6 @@ func BenchmarkMemoryAllocations(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		ctx := runtime.NewContext(data)
-		runtime.Execute(tmpl, ctx)
+		_, _ = runtime.Execute(tmpl, ctx)
 	}
 }

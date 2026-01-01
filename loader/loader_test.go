@@ -19,7 +19,7 @@ func TestFileSystemLoader_Load(t *testing.T) {
 	// Create test template
 	templateContent := "Hello {{.Name}}!"
 	templatePath := filepath.Join(tmpDir, "test.html")
-	err := os.WriteFile(templatePath, []byte(templateContent), 0644)
+	err := os.WriteFile(templatePath, []byte(templateContent), 0o644)
 	if err != nil {
 		t.Fatalf("Failed to create test template: %v", err)
 	}
@@ -49,7 +49,7 @@ func TestFileSystemLoader_LoadWithPath(t *testing.T) {
 
 	// Create nested directory structure
 	nestedDir := filepath.Join(tmpDir, "layouts")
-	err := os.MkdirAll(nestedDir, 0755)
+	err := os.MkdirAll(nestedDir, 0o755)
 	if err != nil {
 		t.Fatalf("Failed to create nested directory: %v", err)
 	}
@@ -57,7 +57,7 @@ func TestFileSystemLoader_LoadWithPath(t *testing.T) {
 	// Create template in nested directory
 	templateContent := "Layout: {{.Title}}"
 	templatePath := filepath.Join(nestedDir, "main.html")
-	err = os.WriteFile(templatePath, []byte(templateContent), 0644)
+	err = os.WriteFile(templatePath, []byte(templateContent), 0o644)
 	if err != nil {
 		t.Fatalf("Failed to create template: %v", err)
 	}
@@ -89,7 +89,7 @@ func TestFileSystemLoader_Exists(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	templatePath := filepath.Join(tmpDir, "exists.html")
-	err := os.WriteFile(templatePath, []byte("content"), 0644)
+	err := os.WriteFile(templatePath, []byte("content"), 0o644)
 	if err != nil {
 		t.Fatalf("Failed to create test template: %v", err)
 	}
@@ -109,12 +109,12 @@ func TestFileSystemLoader_MultipleExtensions(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create templates with different extensions
-	err := os.WriteFile(filepath.Join(tmpDir, "test1.html"), []byte("HTML"), 0644)
+	err := os.WriteFile(filepath.Join(tmpDir, "test1.html"), []byte("HTML"), 0o644)
 	if err != nil {
 		t.Fatalf("Failed to create template: %v", err)
 	}
 
-	err = os.WriteFile(filepath.Join(tmpDir, "test2.tpl"), []byte("TPL"), 0644)
+	err = os.WriteFile(filepath.Join(tmpDir, "test2.tpl"), []byte("TPL"), 0o644)
 	if err != nil {
 		t.Fatalf("Failed to create template: %v", err)
 	}
@@ -144,7 +144,7 @@ func TestFileSystemLoader_ClearCache(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	templatePath := filepath.Join(tmpDir, "cached.html")
-	err := os.WriteFile(templatePath, []byte("content"), 0644)
+	err := os.WriteFile(templatePath, []byte("content"), 0o644)
 	if err != nil {
 		t.Fatalf("Failed to create test template: %v", err)
 	}
@@ -233,4 +233,10 @@ func TestTemplateCache(t *testing.T) {
 	if cache.Has("test1") || cache.Has("test2") {
 		t.Error("Expected cache to be cleared")
 	}
+}
+
+func TestEmbedLoaderClearCache(t *testing.T) {
+	// Test that ClearCache doesn't panic on EmbedLoader
+	ldr := NewEmbedLoader(nil, "templates", []string{".html"})
+	ldr.ClearCache() // Should not panic
 }

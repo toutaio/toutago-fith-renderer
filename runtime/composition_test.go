@@ -320,7 +320,7 @@ func TestCompositionRuntime_FileSystemIntegration(t *testing.T) {
 <head><title>{{block "title"}}Default{{end}}</title></head>
 <body>{{block "content"}}{{end}}</body>
 </html>`
-	err := os.WriteFile(layoutPath, []byte(layoutContent), 0644)
+	err := os.WriteFile(layoutPath, []byte(layoutContent), 0o644)
 	if err != nil {
 		t.Fatalf("Failed to write layout: %v", err)
 	}
@@ -328,7 +328,7 @@ func TestCompositionRuntime_FileSystemIntegration(t *testing.T) {
 	// Create page
 	pagePath := filepath.Join(tmpDir, "page.html")
 	pageContent := `{{extends "layout"}}{{block "title"}}My Page{{end}}{{block "content"}}<h1>Welcome!</h1>{{end}}`
-	err = os.WriteFile(pagePath, []byte(pageContent), 0644)
+	err = os.WriteFile(pagePath, []byte(pageContent), 0o644)
 	if err != nil {
 		t.Fatalf("Failed to write page: %v", err)
 	}

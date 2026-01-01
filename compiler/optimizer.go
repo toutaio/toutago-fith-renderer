@@ -134,7 +134,8 @@ func (o *Optimizer) optimizeNodes(nodes []parser.Node) []parser.Node {
 }
 
 // isConstantBool checks if a node is a constant boolean literal.
-func (o *Optimizer) isConstantBool(node parser.Node) (bool, bool) {
+// Returns (value, true) if it's a constant bool, or (false, false) otherwise.
+func (o *Optimizer) isConstantBool(node parser.Node) (value, ok bool) {
 	if lit, ok := node.(*parser.LiteralNode); ok {
 		if b, ok := lit.Value.(bool); ok {
 			return b, true

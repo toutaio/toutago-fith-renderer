@@ -139,7 +139,7 @@ func (c *Context) PopScope() {
 }
 
 // GetIndex retrieves a value from a slice or map by index/key.
-func (c *Context) GetIndex(obj interface{}, index interface{}) (interface{}, error) {
+func (c *Context) GetIndex(obj, index interface{}) (interface{}, error) {
 	if obj == nil {
 		return nil, fmt.Errorf("cannot index nil value")
 	}
@@ -239,7 +239,7 @@ func ToSlice(val interface{}) ([]interface{}, bool) {
 
 // ToMap converts a value to a map for iteration.
 // Returns the map keys and values, and whether the conversion was successful.
-func ToMap(val interface{}) ([]interface{}, []interface{}, bool) {
+func ToMap(val interface{}) (keys, values []interface{}, ok bool) {
 	if val == nil {
 		return nil, nil, false
 	}
@@ -258,14 +258,14 @@ func ToMap(val interface{}) ([]interface{}, []interface{}, bool) {
 		return nil, nil, false
 	}
 
-	keys := v.MapKeys()
-	keySlice := make([]interface{}, len(keys))
-	valSlice := make([]interface{}, len(keys))
+	mapKeys := v.MapKeys()
+	keys = make([]interface{}, len(mapKeys))
+	values = make([]interface{}, len(mapKeys))
 
-	for i, k := range keys {
-		keySlice[i] = k.Interface()
-		valSlice[i] = v.MapIndex(k).Interface()
+	for i, k := range mapKeys {
+		keys[i] = k.Interface()
+		values[i] = v.MapIndex(k).Interface()
 	}
 
-	return keySlice, valSlice, true
+	return keys, values, true
 }

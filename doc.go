@@ -8,7 +8,7 @@ Jinja2 and Twig, designed for generating HTML, text, and other formats from temp
 
 Create a new engine and render a template:
 
-	engine, err := fith.New(fith.Config{
+	engine, err := fith.New(&fith.Config{
 	    TemplateDir: "templates",
 	})
 	if err != nil {
@@ -79,7 +79,7 @@ The engine can be configured with various options:
 	    MaxIncludeDepth: 100,
 	}
 
-	engine, err := fith.New(config)
+	engine, err := fith.New(&config)
 
 # Custom Functions
 

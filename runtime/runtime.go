@@ -80,21 +80,21 @@ func (r *Runtime) executeNode(node parser.Node) error {
 		if err != nil {
 			return err
 		}
-		r.output.WriteString(fmt.Sprint(val))
+		_, _ = fmt.Fprint(r.output, val)
 		return nil
 	case *parser.UnaryOpNode:
 		val, err := r.evaluateUnaryOp(n)
 		if err != nil {
 			return err
 		}
-		r.output.WriteString(fmt.Sprint(val))
+		_, _ = fmt.Fprint(r.output, val)
 		return nil
 	case *parser.LiteralNode:
 		val, err := r.evaluateLiteral(n)
 		if err != nil {
 			return err
 		}
-		r.output.WriteString(fmt.Sprint(val))
+		_, _ = fmt.Fprint(r.output, val)
 		return nil
 	case *parser.CallNode:
 		return r.executeCall(n)
@@ -105,7 +105,7 @@ func (r *Runtime) executeNode(node parser.Node) error {
 		if err != nil {
 			return err
 		}
-		r.output.WriteString(fmt.Sprint(val))
+		_, _ = fmt.Fprint(r.output, val)
 		return nil
 	default:
 		return fmt.Errorf("unsupported node type: %T", node)
@@ -126,7 +126,7 @@ func (r *Runtime) executeVariable(node *parser.VariableNode) error {
 	}
 
 	// Convert value to string and write to output
-	r.output.WriteString(fmt.Sprint(val))
+	_, _ = fmt.Fprint(r.output, val)
 	return nil
 }
 
@@ -207,7 +207,10 @@ func (r *Runtime) executeRangeSlice(node *parser.RangeNode, items []interface{})
 }
 
 // executeRangeMap executes a range loop over a map.
-func (r *Runtime) executeRangeMap(node *parser.RangeNode, keys []interface{}, vals []interface{}) error {
+func (r *Runtime) executeRangeMap(
+	node *parser.RangeNode,
+	keys, vals []interface{},
+) error {
 	for idx, key := range keys {
 		// Push new scope
 		r.context.PushScope()
@@ -237,13 +240,13 @@ func (r *Runtime) executeRangeMap(node *parser.RangeNode, keys []interface{}, va
 // executeCall executes a function call.
 func (r *Runtime) executeCall(node *parser.CallNode) error {
 	// Special case: if it's a no-arg call starting with @, treat it as a variable
-	if len(node.Args) == 0 && len(node.Function) > 0 && node.Function[0] == '@' {
+	if len(node.Args) == 0 && node.Function != "" && node.Function[0] == '@' {
 		// This is a special loop variable like @index, @first, @last
 		val, err := r.context.Get([]string{node.Function})
 		if err != nil {
 			return fmt.Errorf("variable error at %d:%d: %v", node.Position.Line, node.Position.Column, err)
 		}
-		r.output.WriteString(fmt.Sprint(val))
+		_, _ = fmt.Fprint(r.output, val)
 		return nil
 	}
 
@@ -264,7 +267,7 @@ func (r *Runtime) executeCall(node *parser.CallNode) error {
 	}
 
 	// Output the result
-	r.output.WriteString(fmt.Sprint(result))
+	_, _ = fmt.Fprint(r.output, result)
 	return nil
 }
 
@@ -285,7 +288,7 @@ func (r *Runtime) executePipe(node *parser.PipeNode) error {
 	}
 
 	// Output the final result
-	r.output.WriteString(fmt.Sprint(val))
+	_, _ = fmt.Fprint(r.output, val)
 	return nil
 }
 
@@ -304,7 +307,7 @@ func (r *Runtime) evaluateExpression(node parser.Node) (interface{}, error) {
 		return r.evaluateIndex(n)
 	case *parser.CallNode:
 		// Special case: @variables
-		if len(n.Args) == 0 && len(n.Function) > 0 && n.Function[0] == '@' {
+		if len(n.Args) == 0 && n.Function != "" && n.Function[0] == '@' {
 			return r.context.Get([]string{n.Function})
 		}
 		// Evaluate function calls

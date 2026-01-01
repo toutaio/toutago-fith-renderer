@@ -205,11 +205,11 @@ func fnReplace(args ...interface{}) (interface{}, error) {
 	if !ok {
 		return nil, fmt.Errorf("replace: second argument must be a string")
 	}
-	new, ok := args[2].(string)
+	replacement, ok := args[2].(string)
 	if !ok {
 		return nil, fmt.Errorf("replace: third argument must be a string")
 	}
-	return strings.ReplaceAll(s, old, new), nil
+	return strings.ReplaceAll(s, old, replacement), nil
 }
 
 // ============================================================================

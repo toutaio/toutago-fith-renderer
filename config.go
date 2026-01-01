@@ -5,6 +5,13 @@ import (
 	"io/fs"
 )
 
+// Default configuration constants
+const (
+	defaultTemplateDir    = "templates"
+	defaultLeftDelimiter  = "{{"
+	defaultRightDelimiter = "}}"
+)
+
 // Config configures the Fíth template engine.
 type Config struct {
 	// TemplateDir is the base directory for template files.
@@ -86,7 +93,7 @@ func (c *Config) Validate() error {
 // applyDefaults applies default values to missing configuration options.
 func (c *Config) applyDefaults() {
 	if c.TemplateDir == "" && c.TemplateFS == nil {
-		c.TemplateDir = "templates"
+		c.TemplateDir = defaultTemplateDir
 	}
 
 	if len(c.Extensions) == 0 {
@@ -94,11 +101,11 @@ func (c *Config) applyDefaults() {
 	}
 
 	if c.LeftDelimiter == "" {
-		c.LeftDelimiter = "{{"
+		c.LeftDelimiter = defaultLeftDelimiter
 	}
 
 	if c.RightDelimiter == "" {
-		c.RightDelimiter = "}}"
+		c.RightDelimiter = defaultRightDelimiter
 	}
 
 	if c.MaxIncludeDepth == 0 {

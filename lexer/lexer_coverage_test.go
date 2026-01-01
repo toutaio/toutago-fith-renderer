@@ -66,7 +66,7 @@ func TestLexer_StringWithEscapes(t *testing.T) {
 
 	for _, tt := range tests {
 		l := New(tt.input)
-		l.NextToken() // {{
+		_, _ = l.NextToken() // {{
 		tok, err := l.NextToken()
 		if err != nil {
 			t.Errorf("input %q: unexpected error: %v", tt.input, err)
@@ -94,7 +94,7 @@ func TestLexer_NumberFormats(t *testing.T) {
 
 	for _, tt := range tests {
 		l := New(tt.input)
-		l.NextToken() // {{
+		_, _ = l.NextToken() // {{
 		tok, err := l.NextToken()
 		if err != nil {
 			t.Errorf("input %q: unexpected error: %v", tt.input, err)
@@ -111,7 +111,7 @@ func TestLexer_NumberFormats(t *testing.T) {
 
 func TestLexer_IdentifierStartingWithAt(t *testing.T) {
 	l := New("{{@index}}")
-	l.NextToken() // {{
+	_, _ = l.NextToken() // {{
 	tok, err := l.NextToken()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -132,7 +132,7 @@ func TestLexer_UnterminatedString(t *testing.T) {
 
 	for _, input := range inputs {
 		l := New(input)
-		l.NextToken() // {{
+		_, _ = l.NextToken() // {{
 		_, err := l.NextToken()
 		if err == nil {
 			t.Errorf("input %q: expected error for unterminated/invalid string", input)
@@ -165,7 +165,7 @@ func TestLexer_AllOperators(t *testing.T) {
 
 	for _, tt := range operators {
 		l := New(tt.input)
-		l.NextToken() // {{
+		_, _ = l.NextToken() // {{
 		tok, err := l.NextToken()
 		if err != nil {
 			t.Errorf("input %q: unexpected error: %v", tt.input, err)
@@ -191,7 +191,7 @@ func TestLexer_Keywords_Extended(t *testing.T) {
 	for word, expectedType := range keywords {
 		input := "{{" + word + "}}"
 		l := New(input)
-		l.NextToken() // {{
+		_, _ = l.NextToken() // {{
 		tok, err := l.NextToken()
 		if err != nil {
 			t.Errorf("input %q: unexpected error: %v", word, err)
