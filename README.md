@@ -123,15 +123,22 @@ Create reusable layouts:
 ✅ **Production Ready** - All phases complete!
 
 - ✅ Project structure and tooling
-- ✅ Lexer implementation (93.4% coverage)
-- ✅ Parser implementation (69.1% coverage)
-- ✅ Runtime engine (80.2% coverage)
+- ✅ Lexer implementation (95%+ coverage)
+- ✅ Parser implementation (80%+ coverage)
+- ✅ Runtime engine (80%+ coverage)
 - ✅ Built-in functions (16 functions)
 - ✅ Template loading (filesystem & embed.FS)
 - ✅ Template composition (includes & layouts)
 - ✅ Comprehensive documentation
 
-**Test Results:** 131 tests passing, 80.7% overall coverage
+**Test Coverage:** 130+ tests passing, 84%+ overall coverage
+
+### Project Information
+
+- **Current Release**: See [Releases](https://github.com/toutaio/toutago-fith-renderer/releases)
+- **Go Version**: 1.22+
+- **Status**: Production Ready
+- **Documentation**: See [CHANGELOG.md](CHANGELOG.md) for version history
 
 ## Installation
 
