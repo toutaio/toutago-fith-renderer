@@ -9,6 +9,12 @@ A powerful, flexible template engine for Go inspired by Celtic craftsmanship.
 
 > **Fíth** (Old Irish): The art of weaving patterns - representing how templates weave data into beautiful output.
 
+## Status
+
+✅ **Production Ready** - Stable v1.0+ releases  
+📦 [View Releases](https://github.com/toutaio/toutago-fith-renderer/releases) for the latest version  
+📖 [Changelog](CHANGELOG.md) - Full version history
+
 ## Features
 
 - 🎯 **Modern Syntax**: Jinja2/Twig-inspired template syntax
